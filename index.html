@@ -1,502 +1,485 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.5">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D Model Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: Arial, sans-serif;
+        }
+        
+        #container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 18px;
+            z-index: 100;
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 4px solid #333;
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff6b6b;
+            font-size: 16px;
+            z-index: 100;
+            text-align: center;
+            display: none;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 12px;
+            z-index: 100;
+            opacity: 0.7;
+        }
+    </style>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;3D Model Viewer&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>* {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>padding: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body, html {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>height: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>overflow: hidden;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>background: #000;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-family: Arial, sans-serif;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#container {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 100vw;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>height: 100vh;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>position: relative;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#loading {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>position: absolute;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>top: 50%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>left: 50%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>transform: translate(-50%, -50%);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 18px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>z-index: 100;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>text-align: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.spinner {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border: 4px solid #333;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-top: 4px solid #fff;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>border-radius: 50%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>width: 40px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>height: 40px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>animation: spin 1s linear infinite;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>margin: 0 auto 20px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>@keyframes spin {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>0% { transform: rotate(0deg); }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>100% { transform: rotate(360deg); }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#error {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>position: absolute;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>top: 50%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>left: 50%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>transform: translate(-50%, -50%);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: #ff6b6b;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 16px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>z-index: 100;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>text-align: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>display: none;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#info {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>position: absolute;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>top: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>left: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>color: white;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>font-size: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>z-index: 100;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>opacity: 0.7;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="container"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="loading"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="spinner"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div&gt;Loading 3D Model...&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="error"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div&gt;Error loading model&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div id="error-message"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="info"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>Pinch to zoom • Drag to rotate • Two fingers to pan</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/MTLLoader.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/OBJLoader.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>class ModelViewer {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>constructor() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.camera = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.model = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.controls = null;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Touch handling</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.isRotating = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.isPanning = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.isZooming = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.lastTouchDistance = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.lastTouchX = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.lastTouchY = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.rotationSpeed = 0.005;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.zoomSpeed = 0.01;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.panSpeed = 0.002;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Camera controls</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.cameraDistance = 5;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.cameraTarget = new THREE.Vector3(0, 0, 0);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.spherical = new THREE.Spherical(this.cameraDistance, Math.PI / 2, 0);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.init();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>init() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.setupScene();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.setupLighting();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.setupCamera();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.setupRenderer();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.setupEventListeners();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.loadModel();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.animate();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setupScene() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene = new THREE.Scene();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene.background = new THREE.Color(0x222222);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene.fog = new THREE.Fog(0x222222, 10, 50);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setupLighting() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Ambient light for overall illumination</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const ambientLight = new THREE.AmbientLight(0x404040, 0.4);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene.add(ambientLight);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Key light (main directional light)</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.position.set(5, 5, 5);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.castShadow = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.shadow.mapSize.width = 2048;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.shadow.mapSize.height = 2048;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.shadow.camera.near = 0.1;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.shadow.camera.far = 50;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.shadow.camera.left = -10;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.shadow.camera.right = 10;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.shadow.camera.top = 10;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>keyLight.shadow.camera.bottom = -10;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene.add(keyLight);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Fill light from opposite side</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const fillLight = new THREE.DirectionalLight(0x8080ff, 0.3);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>fillLight.position.set(-3, 2, -3);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene.add(fillLight);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Rim light from behind</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>rimLight.position.set(-5, 5, -5);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene.add(rimLight);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Point lights for additional detail</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const pointLight1 = new THREE.PointLight(0xffffff, 0.5, 10);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pointLight1.position.set(3, 3, 3);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene.add(pointLight1);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const pointLight2 = new THREE.PointLight(0x8080ff, 0.3, 8);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>pointLight2.position.set(-2, -2, 2);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene.add(pointLight2);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setupCamera() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.camera = new THREE.PerspectiveCamera(</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>45,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>window.innerWidth / window.innerHeight,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>0.1,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>1000</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.updateCameraPosition();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setupRenderer() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer = new THREE.WebGLRenderer({<span class="Apple-converted-space"> </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>antialias: true,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>alpha: true</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer.setSize(window.innerWidth, window.innerHeight);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer.setPixelRatio(window.devicePixelRatio);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer.shadowMap.enabled = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer.outputEncoding = THREE.sRGBEncoding;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer.toneMapping = THREE.ACESFilmicToneMapping;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer.toneMappingExposure = 1.2;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('container').appendChild(this.renderer.domElement);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>setupEventListeners() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>window.addEventListener('resize', () =&gt; this.onWindowResize());</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const canvas = this.renderer.domElement;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Touch events</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>canvas.addEventListener('touchstart', (e) =&gt; this.onTouchStart(e), { passive: false });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>canvas.addEventListener('touchmove', (e) =&gt; this.onTouchMove(e), { passive: false });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>canvas.addEventListener('touchend', (e) =&gt; this.onTouchEnd(e), { passive: false });</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Mouse events for desktop testing</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>canvas.addEventListener('mousedown', (e) =&gt; this.onMouseDown(e));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>canvas.addEventListener('mousemove', (e) =&gt; this.onMouseMove(e));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>canvas.addEventListener('mouseup', (e) =&gt; this.onMouseUp(e));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>canvas.addEventListener('wheel', (e) =&gt; this.onWheel(e), { passive: false });</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Prevent context menu</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>canvas.addEventListener('contextmenu', (e) =&gt; e.preventDefault());</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>getUrlParams() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const params = new URLSearchParams(window.location.search);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>obj: params.get('obj') || '',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>mtl: params.get('mtl') || ''</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>};</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>loadModel() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const params = this.getUrlParams();</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (!params.obj) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.showError('No OBJ URL provided. Add ?obj=your_model_url.obj to the URL');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Check if loaders are available</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (typeof THREE.MTLLoader === 'undefined' || typeof THREE.OBJLoader === 'undefined') {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.showError('Model loaders not available. Check CDN links.');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const mtlLoader = new THREE.MTLLoader();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const objLoader = new THREE.OBJLoader();</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const loadObj = (materials) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (materials) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>objLoader.setMaterials(materials);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>objLoader.load(</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>params.obj,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>(object) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>this.onModelLoaded(object);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>(progress) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>console.log('Loading progress:', progress);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>(error) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>console.error('Error loading OBJ:', error);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>this.showError('Failed to load OBJ file: ' + (error.message || 'Unknown error'));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>};</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (params.mtl) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>mtlLoader.load(</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>params.mtl,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>(materials) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>materials.preload();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>loadObj(materials);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>(progress) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>console.log('MTL Loading progress:', progress);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>(error) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>console.warn('Failed to load MTL, loading OBJ without materials:', error);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>loadObj(null);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>} else {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>loadObj(null);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onModelLoaded(object) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.model = object;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Center and scale the model</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const box = new THREE.Box3().setFromObject(object);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const center = box.getCenter(new THREE.Vector3());</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const size = box.getSize(new THREE.Vector3());</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const maxDim = Math.max(size.x, size.y, size.z);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const scale = 2 / maxDim;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>object.position.sub(center);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>object.scale.setScalar(scale);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Enable shadows for all meshes</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>object.traverse((child) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (child.isMesh) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>child.castShadow = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>child.receiveShadow = true;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>// Enhance materials if no MTL was loaded</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>if (!child.material.map) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>if (child.material.isMeshLambertMaterial) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>const material = new THREE.MeshPhongMaterial({</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>color: child.material.color,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                    </span>shininess: 30</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                                </span>child.material = material;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                            </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.scene.add(object);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.hideLoading();</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>// Adjust camera distance based on model size</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.cameraDistance = Math.max(3, maxDim * scale * 2);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.spherical.radius = this.cameraDistance;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.updateCameraPosition();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onTouchStart(event) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>event.preventDefault();</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (event.touches.length === 1) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.isRotating = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.lastTouchX = event.touches[0].clientX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.lastTouchY = event.touches[0].clientY;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>} else if (event.touches.length === 2) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.isPanning = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.isZooming = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.isRotating = false;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const dx = event.touches[0].clientX - event.touches[1].clientX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const dy = event.touches[0].clientY - event.touches[1].clientY;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.lastTouchDistance = Math.sqrt(dx * dx + dy * dy);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.lastTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.lastTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onTouchMove(event) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>event.preventDefault();</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (this.isRotating &amp;&amp; event.touches.length === 1) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const deltaX = event.touches[0].clientX - this.lastTouchX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const deltaY = event.touches[0].clientY - this.lastTouchY;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.spherical.theta -= deltaX * this.rotationSpeed;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.spherical.phi += deltaY * this.rotationSpeed;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, this.spherical.phi));</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.lastTouchX = event.touches[0].clientX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.lastTouchY = event.touches[0].clientY;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.updateCameraPosition();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>} else if (event.touches.length === 2) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>// Handle zooming</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const dx = event.touches[0].clientX - event.touches[1].clientX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const dy = event.touches[0].clientY - event.touches[1].clientY;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>const distance = Math.sqrt(dx * dx + dy * dy);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (this.isZooming) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const deltaDistance = distance - this.lastTouchDistance;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>this.spherical.radius -= deltaDistance * this.zoomSpeed;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>this.spherical.radius = Math.max(0.5, Math.min(20, this.spherical.radius));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>this.lastTouchDistance = distance;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>// Handle panning</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>if (this.isPanning) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const currentTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const currentTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const deltaX = currentTouchX - this.lastTouchX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const deltaY = currentTouchY - this.lastTouchY;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const panVector = new THREE.Vector3(-deltaX, deltaY, 0);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>panVector.multiplyScalar(this.panSpeed * this.spherical.radius);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const cameraDirection = new THREE.Vector3();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>this.camera.getWorldDirection(cameraDirection);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const right = new THREE.Vector3().crossVectors(cameraDirection, this.camera.up).normalize();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const up = new THREE.Vector3().crossVectors(right, cameraDirection).normalize();</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>const panOffset = new THREE.Vector3();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>panOffset.addScaledVector(right, panVector.x);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>panOffset.addScaledVector(up, panVector.y);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>this.cameraTarget.add(panOffset);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>this.lastTouchX = currentTouchX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>this.lastTouchY = currentTouchY;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                    </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>this.updateCameraPosition();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onTouchEnd(event) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>event.preventDefault();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.isRotating = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.isPanning = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.isZooming = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>// Mouse events for desktop testing</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onMouseDown(event) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.isRotating = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.lastTouchX = event.clientX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.lastTouchY = event.clientY;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onMouseMove(event) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>if (!this.isRotating) return;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const deltaX = event.clientX - this.lastTouchX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const deltaY = event.clientY - this.lastTouchY;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.spherical.theta -= deltaX * this.rotationSpeed;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.spherical.phi += deltaY * this.rotationSpeed;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, this.spherical.phi));</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.lastTouchX = event.clientX;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.lastTouchY = event.clientY;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.updateCameraPosition();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onMouseUp(event) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.isRotating = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onWheel(event) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>event.preventDefault();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.spherical.radius += event.deltaY * 0.01;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.spherical.radius = Math.max(0.5, Math.min(20, this.spherical.radius));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.updateCameraPosition();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>updateCameraPosition() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const position = new THREE.Vector3().setFromSpherical(this.spherical);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>position.add(this.cameraTarget);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.camera.position.copy(position);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.camera.lookAt(this.cameraTarget);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>onWindowResize() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.camera.aspect = window.innerWidth / window.innerHeight;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.camera.updateProjectionMatrix();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer.setSize(window.innerWidth, window.innerHeight);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>showError(message) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('loading').style.display = 'none';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('error').style.display = 'block';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('error-message').textContent = message;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>hideLoading() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('loading').style.display = 'none';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>animate() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>requestAnimationFrame(() =&gt; this.animate());</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>this.renderer.render(this.scene, this.camera);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">        </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>// Initialize the viewer when the page loads</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>window.addEventListener('load', () =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>new ModelViewer();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+    <div id="container">
+        <div id="loading">
+            <div class="spinner"></div>
+            <div>Loading 3D Model...</div>
+        </div>
+        <div id="error">
+            <div>Error loading model</div>
+            <div id="error-message"></div>
+        </div>
+        <div id="info">
+            Pinch to zoom • Drag to rotate • Two fingers to pan
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/MTLLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/loaders/OBJLoader.js"></script>
+    <script>
+        class ModelViewer {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.model = null;
+                this.controls = null;
+                
+                // Touch handling
+                this.isRotating = false;
+                this.isPanning = false;
+                this.isZooming = false;
+                this.lastTouchDistance = 0;
+                this.lastTouchX = 0;
+                this.lastTouchY = 0;
+                this.rotationSpeed = 0.005;
+                this.zoomSpeed = 0.01;
+                this.panSpeed = 0.002;
+                
+                // Camera controls
+                this.cameraDistance = 5;
+                this.cameraTarget = new THREE.Vector3(0, 0, 0);
+                this.spherical = new THREE.Spherical(this.cameraDistance, Math.PI / 2, 0);
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupScene();
+                this.setupLighting();
+                this.setupCamera();
+                this.setupRenderer();
+                this.setupEventListeners();
+                this.loadModel();
+                this.animate();
+            }
+            
+            setupScene() {
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x222222);
+                this.scene.fog = new THREE.Fog(0x222222, 10, 50);
+            }
+            
+            setupLighting() {
+                // Ambient light for overall illumination
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+                this.scene.add(ambientLight);
+                
+                // Key light (main directional light)
+                const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
+                keyLight.position.set(5, 5, 5);
+                keyLight.castShadow = true;
+                keyLight.shadow.mapSize.width = 2048;
+                keyLight.shadow.mapSize.height = 2048;
+                keyLight.shadow.camera.near = 0.1;
+                keyLight.shadow.camera.far = 50;
+                keyLight.shadow.camera.left = -10;
+                keyLight.shadow.camera.right = 10;
+                keyLight.shadow.camera.top = 10;
+                keyLight.shadow.camera.bottom = -10;
+                this.scene.add(keyLight);
+                
+                // Fill light from opposite side
+                const fillLight = new THREE.DirectionalLight(0x8080ff, 0.3);
+                fillLight.position.set(-3, 2, -3);
+                this.scene.add(fillLight);
+                
+                // Rim light from behind
+                const rimLight = new THREE.DirectionalLight(0xffffff, 0.6);
+                rimLight.position.set(-5, 5, -5);
+                this.scene.add(rimLight);
+                
+                // Point lights for additional detail
+                const pointLight1 = new THREE.PointLight(0xffffff, 0.5, 10);
+                pointLight1.position.set(3, 3, 3);
+                this.scene.add(pointLight1);
+                
+                const pointLight2 = new THREE.PointLight(0x8080ff, 0.3, 8);
+                pointLight2.position.set(-2, -2, 2);
+                this.scene.add(pointLight2);
+            }
+            
+            setupCamera() {
+                this.camera = new THREE.PerspectiveCamera(
+                    45,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    1000
+                );
+                this.updateCameraPosition();
+            }
+            
+            setupRenderer() {
+                this.renderer = new THREE.WebGLRenderer({ 
+                    antialias: true,
+                    alpha: true
+                });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.outputEncoding = THREE.sRGBEncoding;
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.2;
+                
+                document.getElementById('container').appendChild(this.renderer.domElement);
+            }
+            
+            setupEventListeners() {
+                window.addEventListener('resize', () => this.onWindowResize());
+                
+                const canvas = this.renderer.domElement;
+                
+                // Touch events
+                canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
+                canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
+                canvas.addEventListener('touchend', (e) => this.onTouchEnd(e), { passive: false });
+                
+                // Mouse events for desktop testing
+                canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
+                canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
+                canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
+                canvas.addEventListener('wheel', (e) => this.onWheel(e), { passive: false });
+                
+                // Prevent context menu
+                canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
+            
+            getUrlParams() {
+                const params = new URLSearchParams(window.location.search);
+                return {
+                    obj: params.get('obj') || '',
+                    mtl: params.get('mtl') || ''
+                };
+            }
+            
+            loadModel() {
+                const params = this.getUrlParams();
+                
+                if (!params.obj) {
+                    this.showError('No OBJ URL provided. Add ?obj=your_model_url.obj to the URL');
+                    return;
+                }
+                
+                // Check if loaders are available
+                if (typeof THREE.MTLLoader === 'undefined' || typeof THREE.OBJLoader === 'undefined') {
+                    this.showError('Model loaders not available. Check CDN links.');
+                    return;
+                }
+                
+                const mtlLoader = new THREE.MTLLoader();
+                const objLoader = new THREE.OBJLoader();
+                
+                const loadObj = (materials) => {
+                    if (materials) {
+                        objLoader.setMaterials(materials);
+                    }
+                    
+                    objLoader.load(
+                        params.obj,
+                        (object) => {
+                            this.onModelLoaded(object);
+                        },
+                        (progress) => {
+                            console.log('Loading progress:', progress);
+                        },
+                        (error) => {
+                            console.error('Error loading OBJ:', error);
+                            this.showError('Failed to load OBJ file: ' + (error.message || 'Unknown error'));
+                        }
+                    );
+                };
+                
+                if (params.mtl) {
+                    mtlLoader.load(
+                        params.mtl,
+                        (materials) => {
+                            materials.preload();
+                            loadObj(materials);
+                        },
+                        (progress) => {
+                            console.log('MTL Loading progress:', progress);
+                        },
+                        (error) => {
+                            console.warn('Failed to load MTL, loading OBJ without materials:', error);
+                            loadObj(null);
+                        }
+                    );
+                } else {
+                    loadObj(null);
+                }
+            }
+            
+            onModelLoaded(object) {
+                this.model = object;
+                
+                // Center and scale the model
+                const box = new THREE.Box3().setFromObject(object);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 2 / maxDim;
+                
+                object.position.sub(center);
+                object.scale.setScalar(scale);
+                
+                // Enable shadows for all meshes
+                object.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        
+                        // Enhance materials if no MTL was loaded
+                        if (!child.material.map) {
+                            if (child.material.isMeshLambertMaterial) {
+                                const material = new THREE.MeshPhongMaterial({
+                                    color: child.material.color,
+                                    shininess: 30
+                                });
+                                child.material = material;
+                            }
+                        }
+                    }
+                });
+                
+                this.scene.add(object);
+                this.hideLoading();
+                
+                // Adjust camera distance based on model size
+                this.cameraDistance = Math.max(3, maxDim * scale * 2);
+                this.spherical.radius = this.cameraDistance;
+                this.updateCameraPosition();
+            }
+            
+            onTouchStart(event) {
+                event.preventDefault();
+                
+                if (event.touches.length === 1) {
+                    this.isRotating = true;
+                    this.lastTouchX = event.touches[0].clientX;
+                    this.lastTouchY = event.touches[0].clientY;
+                } else if (event.touches.length === 2) {
+                    this.isPanning = true;
+                    this.isZooming = true;
+                    this.isRotating = false;
+                    
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    this.lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    this.lastTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+                    this.lastTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+                }
+            }
+            
+            onTouchMove(event) {
+                event.preventDefault();
+                
+                if (this.isRotating && event.touches.length === 1) {
+                    const deltaX = event.touches[0].clientX - this.lastTouchX;
+                    const deltaY = event.touches[0].clientY - this.lastTouchY;
+                    
+                    this.spherical.theta -= deltaX * this.rotationSpeed;
+                    this.spherical.phi += deltaY * this.rotationSpeed;
+                    this.spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, this.spherical.phi));
+                    
+                    this.lastTouchX = event.touches[0].clientX;
+                    this.lastTouchY = event.touches[0].clientY;
+                    
+                    this.updateCameraPosition();
+                } else if (event.touches.length === 2) {
+                    // Handle zooming
+                    const dx = event.touches[0].clientX - event.touches[1].clientX;
+                    const dy = event.touches[0].clientY - event.touches[1].clientY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (this.isZooming) {
+                        const deltaDistance = distance - this.lastTouchDistance;
+                        this.spherical.radius -= deltaDistance * this.zoomSpeed;
+                        this.spherical.radius = Math.max(0.5, Math.min(20, this.spherical.radius));
+                        this.lastTouchDistance = distance;
+                    }
+                    
+                    // Handle panning
+                    if (this.isPanning) {
+                        const currentTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+                        const currentTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+                        
+                        const deltaX = currentTouchX - this.lastTouchX;
+                        const deltaY = currentTouchY - this.lastTouchY;
+                        
+                        const panVector = new THREE.Vector3(-deltaX, deltaY, 0);
+                        panVector.multiplyScalar(this.panSpeed * this.spherical.radius);
+                        
+                        const cameraDirection = new THREE.Vector3();
+                        this.camera.getWorldDirection(cameraDirection);
+                        const right = new THREE.Vector3().crossVectors(cameraDirection, this.camera.up).normalize();
+                        const up = new THREE.Vector3().crossVectors(right, cameraDirection).normalize();
+                        
+                        const panOffset = new THREE.Vector3();
+                        panOffset.addScaledVector(right, panVector.x);
+                        panOffset.addScaledVector(up, panVector.y);
+                        
+                        this.cameraTarget.add(panOffset);
+                        
+                        this.lastTouchX = currentTouchX;
+                        this.lastTouchY = currentTouchY;
+                    }
+                    
+                    this.updateCameraPosition();
+                }
+            }
+            
+            onTouchEnd(event) {
+                event.preventDefault();
+                this.isRotating = false;
+                this.isPanning = false;
+                this.isZooming = false;
+            }
+            
+            // Mouse events for desktop testing
+            onMouseDown(event) {
+                this.isRotating = true;
+                this.lastTouchX = event.clientX;
+                this.lastTouchY = event.clientY;
+            }
+            
+            onMouseMove(event) {
+                if (!this.isRotating) return;
+                
+                const deltaX = event.clientX - this.lastTouchX;
+                const deltaY = event.clientY - this.lastTouchY;
+                
+                this.spherical.theta -= deltaX * this.rotationSpeed;
+                this.spherical.phi += deltaY * this.rotationSpeed;
+                this.spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, this.spherical.phi));
+                
+                this.lastTouchX = event.clientX;
+                this.lastTouchY = event.clientY;
+                
+                this.updateCameraPosition();
+            }
+            
+            onMouseUp(event) {
+                this.isRotating = false;
+            }
+            
+            onWheel(event) {
+                event.preventDefault();
+                this.spherical.radius += event.deltaY * 0.01;
+                this.spherical.radius = Math.max(0.5, Math.min(20, this.spherical.radius));
+                this.updateCameraPosition();
+            }
+            
+            updateCameraPosition() {
+                const position = new THREE.Vector3().setFromSpherical(this.spherical);
+                position.add(this.cameraTarget);
+                this.camera.position.copy(position);
+                this.camera.lookAt(this.cameraTarget);
+            }
+            
+            onWindowResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+            
+            showError(message) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error-message').textContent = message;
+            }
+            
+            hideLoading() {
+                document.getElementById('loading').style.display = 'none';
+            }
+            
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+        
+        // Initialize the viewer when the page loads
+        window.addEventListener('load', () => {
+            new ModelViewer();
+        });
+    </script>
 </body>
 </html>

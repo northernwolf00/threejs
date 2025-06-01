@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Three.js OBJ Loader</title>
+  <title>Three.js OBJ Viewer</title>
   <style>
     html, body {
       margin: 0;
@@ -30,8 +30,8 @@
   const mtlUrl = params.get("mtl");
 
   if (!objUrl || !mtlUrl) {
-    alert("Error: Missing 'obj' or 'mtl' query parameters.");
-    throw new Error("Missing OBJ/MTL URLs");
+    alert("Missing ?obj=...&mtl=... in URL");
+    throw new Error("Missing OBJ/MTL query parameters");
   }
 
   let scene, camera, renderer, controls;
@@ -55,14 +55,12 @@
     controls.dampingFactor = 0.05;
     controls.enableZoom = true;
     controls.enablePan = true;
-    controls.screenSpacePanning = true;
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(10, 10, 10);
-    scene.add(directionalLight);
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(10, 10, 10);
+    scene.add(dirLight);
 
     const mtlLoader = new MTLLoader();
     mtlLoader.load(mtlUrl, (materials) => {
@@ -93,3 +91,4 @@
 </script>
 </body>
 </html>
+
